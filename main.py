@@ -1,6 +1,6 @@
 import requests 
 from bs4 import BeautifulSoup 
-from tabulate import tabulate 
+#from tabulate import tabulate 
 import os 
 import numpy as np 
 from bokeh.io import show
