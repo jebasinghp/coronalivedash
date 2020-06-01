@@ -20,7 +20,7 @@ from bokeh.layouts import widgetbox, column,row
 from bokeh.models import RangeSlider
 from bokeh.models.tools import HoverTool
 from bokeh.transform import factor_cmap
-from bokeh.palettes import Turbo256,linear_palette,Magma256
+from bokeh.palettes import Turbo256,linear_palette,Magma256,Viridis256
 from bokeh.models import Div
 extract_contents = lambda row: [x.text.replace('\n', '') for x in row]  
 URL = 'https://www.mohfw.gov.in/'
@@ -83,7 +83,7 @@ source = ColumnDataSource(dict(
     ly2=[1.2,1.2,1.2,1.2],
     label2=mm,
 ))
-p1 = figure(x_range=(1, 5), y_range=(1,2), plot_height=100, plot_width=1300,tools="")
+p1 = figure(x_range=(1, 5), y_range=(1,2), plot_height=100, plot_width=1300,tools="",toolbar_location=None)
 # legend field matches the column in the source
 p1.quad(top='t', bottom='b', left='l',right='r',color='color',source=source)
 
@@ -119,7 +119,7 @@ def changeArea(attr, old, new):
     source1.data = new_data
 p2=figure(x_range=a,plot_width=1300,plot_height=500,title="Confirmed Corona Cases in India Statewise ",x_axis_label="States",y_axis_label="No of cases",tools="pan,wheel_zoom,box_zoom,reset")
 source1 = ColumnDataSource(data={'states': a, 'confirmed': b , 'colors':linear_palette(Magma256,d)})
-slider = RangeSlider(title='Cases Range', start=0, end=100000, step=1, value=(0,100000),bar_color="green")
+slider = RangeSlider(title='Cases Range', start=0, end=100000, step=1, value=(0,100000),bar_color="orange")
 slider.on_change('value', changeArea)
 p2.vbar(x='states',top='confirmed',bottom=0,width=0.5,fill_color='colors',fill_alpha=0.9,source=source1)
 p2.y_range.start=0
@@ -138,8 +138,22 @@ p2.title.align='center'
 p2.title.text_font_size = '13pt'
 p2.title.text_color = "#3d0099"
 
+
+def changeArea1(attr, old, new):
+    scale1 = slider1.value[0]
+    scale2 = slider1.value[1]
+    dd=df.loc[df['cured'].between(scale1,scale2), 'states']
+    d=len(dd)
+    new_data = {
+        'states' : df.loc[df['cured'].between(scale1,scale2), 'states'],
+        'cured'    : df.loc[df['cured'].between(scale1,scale2), 'cured'],
+        'colors'  : linear_palette(Turbo256,d)
+    }
+    source2.data = new_data
 p3=figure(x_range=a,plot_width=1300,plot_height=500,title=" Cured Corona Cases in India Statewise ",x_axis_label="States ",y_axis_label="No of cases",tools="pan,wheel_zoom,box_zoom,reset")
 source2 = ColumnDataSource(data={'states': a, 'cured': c , 'colors':linear_palette(Turbo256,d)})
+slider1 = RangeSlider(title='Cases Range', start=0, end=60000, step=1, value=(0,60000),bar_color="green")
+slider1.on_change('value', changeArea1)
 p3.vbar(x='states',top='cured',bottom=0,width=0.6,fill_color='colors',fill_alpha=0.9,source=source2)
 p3.y_range.start=0
 hover2=HoverTool()
@@ -158,9 +172,22 @@ p3.title.text_font_size = '13pt'
 p3.title.text_color = "#3d0099"
 #show(p3)
 
-source3=ColumnDataSource(df)
+def changeArea2(attr, old, new):
+    scale1 = slider2.value[0]
+    scale2 = slider2.value[1]
+    dd=df.loc[df['death'].between(scale1,scale2), 'states']
+    d=len(dd)
+    new_data = {
+        'states' : df.loc[df['death'].between(scale1,scale2), 'states'],
+        'death'    : df.loc[df['death'].between(scale1,scale2), 'death'],
+        'colors'  : linear_palette(Viridis256,d)
+    }
+    source3.data = new_data
 p4 = figure(x_range=a, plot_height=500, plot_width=1300,x_axis_label="States ",y_axis_label="No of death",title="No of Deaths in India due to Corona Statewise")
-p4.circle(x='states',y='death', size=15, fill_color="red", line_color="black", line_width=3,source=source3)
+source3 = ColumnDataSource(data={'states': a, 'death': e , 'colors':linear_palette(Viridis256,d)})
+slider2 = RangeSlider(title='Cases Range', start=0, end=20000, step=1, value=(0,20000),bar_color="red")
+slider2.on_change('value', changeArea2)
+p4.circle(x='states',y='death', size=15, fill_color='colors', line_color="black", line_width=3,source=source3)
 p4.xaxis.major_label_orientation = math.pi/2
 p4.title.text_font_size = '13pt'
 p4.title.align='center'
@@ -178,5 +205,5 @@ p4.add_tools(hover3)
 #show(p4)
 
 pre = Div(text="""<div><h2><strong><center>Corona India Live Dashboard</center></strong></h2></div>""",align='center',style={'color': '#3d0099','font-size':'15px'})
-layout = column(pre,p1,widgetbox(slider), p2,p3,p4)
+layout = column(pre,p1,widgetbox(slider), p2,widgetbox(slider1),p3,widgetbox(slider2),p4)
 curdoc().add_root(layout)
