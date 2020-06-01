@@ -102,7 +102,7 @@ p1.add_layout(labels2)
 a=df['states'].tolist()
 b = df['active'].tolist()
 c=df['cured'].tolist()
-e=df['death'].tolist()
+f=df['death'].tolist()
 d=len(df['states'])
 e=df['confirmed'].tolist()
 
@@ -184,8 +184,8 @@ def changeArea2(attr, old, new):
     }
     source3.data = new_data
 p4 = figure(x_range=a, plot_height=500, plot_width=1300,x_axis_label="States ",y_axis_label="No of death",title="No of Deaths in India due to Corona Statewise")
-source3 = ColumnDataSource(data={'states': a, 'death': e , 'colors':linear_palette(Viridis256,d)})
-slider2 = RangeSlider(title='Cases Range', start=0, end=20000, step=1, value=(0,20000),bar_color="red")
+source3 = ColumnDataSource(data={'states': a, 'death': f , 'colors':linear_palette(Viridis256,d)})
+slider2 = RangeSlider(title='Cases Range', start=0, end=10000, step=1, value=(0,10000),bar_color="red")
 slider2.on_change('value', changeArea2)
 p4.circle(x='states',y='death', size=15, fill_color='colors', line_color="black", line_width=3,source=source3)
 p4.xaxis.major_label_orientation = math.pi/2
